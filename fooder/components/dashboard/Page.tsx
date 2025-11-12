@@ -5,7 +5,7 @@ import menuImages from "@/lib/menuImages";
 import Image from "next/image";
 
 const DashboardPage = () => {
-  return (
+  return ( 
     <div className="font-poppins">
       <div className="flex flex-row justify-center h-max">
         <div className="basis-1/2 mx-2 flex justify-center h-max mt-48">
