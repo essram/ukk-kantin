@@ -27,7 +27,7 @@ const AddUser = () => {
     email: ``,
     password: ``,
     role: ``,
-    profile_picture: ``,
+    profil_picture: ``,
     createdAt: ``,
     updatedAt: ``,
   });
@@ -45,7 +45,7 @@ const AddUser = () => {
       email: ``,
       password: ``,
       role: ``,
-      profile_picture: ``,
+      profil_picture: ``,
       createdAt: ``,
       updatedAt: ``,
     });
@@ -62,7 +62,7 @@ const AddUser = () => {
       payload.append("email", email || "");
       payload.append("password", password || "");
       payload.append("role", role || "");
-      if (file !== null) payload.append("picture", file || "");
+      if (file !== null) payload.append("profil_picture", file || "");
       const { data } = await post(url, payload, TOKEN);
       if (data?.status) {
         setIsShow(false);
@@ -199,7 +199,7 @@ const AddUser = () => {
                 "image/jpeg",
                 "image/jpg",
               ]}
-              id="profile_picture"
+              id="profil_picture"
               label="Upload Picture (Max 2MB, PDF/JPG/JPEG/PNG)"
               onChange={(f) => setFile(f)}
               required={false}

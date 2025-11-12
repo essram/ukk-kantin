@@ -85,7 +85,7 @@ export default function TestPage() {
               Welcome Back
             </h1>
             <p className="text-hitamGaHitam py-2 font-poppins text-sm">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit!
+            Di setiap gigitan, ada cerita rasa yang tak terlupakan.
             </p>
             <form onSubmit={handleSubmit} className="w-full my-6">
               <div className="relative w-full my-4 flex justify-center">
@@ -188,7 +188,6 @@ export default function TestPage() {
                   Login
                 </button>
               </div>
-              x
             </form>
           </div>
         </div>
