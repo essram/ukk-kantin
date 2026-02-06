@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `transaction_detail` ADD COLUMN `price` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `subTotal` INTEGER NOT NULL DEFAULT 0;

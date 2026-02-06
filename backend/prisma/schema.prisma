@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model PaymentOrder {
+  id          Int              @id @default(autoincrement())
+  id_order    Int              @unique
+  id_method   Int?
+  uang_masuk  Decimal?         @db.Decimal(10, 2)
+  va          String?          @db.VarChar(20)
+  nomor_kartu String?          @db.VarChar(19)
+  status      StatusPembayaran @default(BELUM_DIBAYAR)
+  created_at  DateTime         @default(now())
+  email       String?
+
+  paymentMethod paymentmethod? @relation(fields: [id_method], references: [id])
+  order         order          @relation(fields: [id_order], references: [id])
+}
+
+model menu {
+  id                 Int                  @id @default(autoincrement())
+  uuid               String               @unique(map: "Menu_uuid_key") @default("")
+  id_stan            Int                  @default(0)
+  name               String               @default("")
+  price              Int                  @default(0)
+  id_category        Int
+  picture            String               @default("")
+  description        String               @default("") @db.Text
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now())
+  transaction_detail transaction_detail[]
+  category           Category             @relation(fields: [id_category], references: [id])
+  stan               admin_stan           @relation(fields: [id_stan], references: [id])
+  menu_diskon        menu_diskon[]
+}
+
+model order {
+  id                 Int                  @id @default(autoincrement())
+  uuid               String               @unique(map: "Order_uuid_key") @default("")
+  id_stan            Int
+  id_siswa           Int
+  customer           String               @default("")
+  total_price        Int                  @default(0)
+  status             order_status         @default(PENDING)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now())
+  tanggal            DateTime
+  userId             Int?
+  note               String?              @default("") @db.Text
+  user               user?                @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
+  location           String
+  transaction_detail transaction_detail[]
+  dine_in            Int                  @default(0)
+  PaymentOrder       PaymentOrder?
+  admin_stan         admin_stan           @relation(fields: [id_stan], references: [id])
+  siswa              siswa                @relation(fields: [id_siswa], references: [id])
+
+  @@index([userId], map: "Order_userId_fkey")
+}
+
+model transaction_detail {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique(map: "transaction_detail_uuid_key") @default("")
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  menuId    Int?
+  orderId   Int?
+  price     Int      @default(0)
+  subTotal  Int      @default(0)
+  menu      menu?    @relation(fields: [menuId], references: [id], map: "transaction_detail_menuId_fkey")
+  order     order?   @relation(fields: [orderId], references: [id], map: "transaction_detail_orderId_fkey")
+
+  @@index([menuId], map: "transaction_detail_menuId_fkey")
+  @@index([orderId], map: "transaction_detail_orderId_fkey")
+}
+
+model paymentmethod {
+  id            Int                @id @default(autoincrement())
+  nama          String             @db.VarChar(50)
+  tipe          paymentmethod_tipe
+  logo          String             @db.VarChar(255)
+  paymentOrders PaymentOrder[]
+}
+
+model user {
+  id              Int         @id @default(autoincrement())
+  uuid            String      @unique(map: "User_uuid_key") @default("")
+  name            String      @default("")
+  email           String      @unique(map: "User_email_key") @default("")
+  password        String      @default("")
+  profile_picture String      @default("")
+  role            user_role   @default(SISWA)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @default(now())
+  order           order[]
+  admin_stan      admin_stan?
+  siswa           siswa?
+}
+
+model siswa {
+  id      Int     @id @default(autoincrement())
+  id_user Int     @unique
+  nama    String
+  alamat  String
+  telp    String  @db.VarChar(15)
+  foto    String  @db.VarChar(255)
+  user    user    @relation(fields: [id_user], references: [id], map: "siswa_id_user_fkey")
+  order   order[]
+}
+
+model admin_stan {
+  id           Int     @id @default(autoincrement())
+  id_user      Int     @unique
+  nama         String
+  nama_pemilik String
+  telp         String  @db.VarChar(15)
+  user         user    @relation(fields: [id_user], references: [id], map: "admin_stan_id_user_fkey")
+  menu         menu[]
+  order        order[]
+}
+
+model Category {
+  id         Int      @id @default(autoincrement())
+  name       String
+  icon       String?
+  bg_color   String?
+  text_color String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  menu       menu[]
+}
+
+model diskon {
+  id                Int    @id @default(autoincrement())
+  nama_diskon       String @db.VarChar(50)
+  persentase_diskon Int
+  tanggal_awal  DateTime
+  tanggal_akhir DateTime
+  menu_diskon   menu_diskon[]
+}
+
+model menu_diskon {
+  id        Int    @id @default(autoincrement())
+  id_menu   Int
+  id_diskon Int
+  menu      menu   @relation(fields: [id_menu], references: [id])
+  diskon    diskon @relation(fields: [id_diskon], references: [id])
+}
+
+enum StatusPembayaran {
+  BELUM_DIBAYAR
+  LUNAS
+  CANCELED
+  BELUM_LUNAS
+}
+
+enum paymentmethod_tipe {
+  CASH
+  VIRTUAL
+}
+
+enum order_status {
+  PENDING
+  PREPARED
+  DELIVERY
+  DELIVERED
+}
+
+enum user_role {
+  ADMIN_STAN
+  SISWA
+}
