@@ -1,93 +1,109 @@
 "use client";
-import { IoChevronBackOutline } from "react-icons/io5";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { IUser } from "@/app/types";
 import { getCookies } from "@/lib/server-cookies";
 import { BASE_API_URL } from "@/global";
 import { get } from "@/lib/api-bridge";
-import { useEffect, useState } from "react";
+import { IoChevronBackOutline } from "react-icons/io5";
+import TransaksiContent from "@/components/transaksiContent";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<IUser | null>(null);
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  const router = useRouter();
-
-  const getUser = async (): Promise<IUser | null> => {
-    try {
-      const TOKEN = (await getCookies("token")) ?? "";
-      const url = `${BASE_API_URL}/user/profile`;
-      const { data } = await get(url, TOKEN);
-
-      if (data?.status) return data.data;
-      return null;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  };
-
   useEffect(() => {
     const fetchUser = async () => {
-      const result = await getUser();
-      setUser(result);
+      const TOKEN = (await getCookies("token")) ?? "";
+      const { data } = await get(`${BASE_API_URL}/user/profile`, TOKEN);
+      if (data?.status) setUser(data.data);
     };
     fetchUser();
   }, []);
 
-  const handleBackClick = () => {
-    router.back();
+  const handleBack = () => {
+    window.history.back();
   };
 
   return (
-    <div className="bg-[#f5f5f5]">
-      {/* <div className=" px-10">
-
+    <div className="bg-[#f5f5f5] min-h-screen font-figtree relative">
+      <div className="absolute top-0 left-0 z-10 p-6">
         <IoChevronBackOutline
-          size={24}
-          className="cursor-pointer "
-          onClick={handleBackClick}
+          size={30}
+          className="cursor-pointer text-white hover:text-black transition-colors"
+          onClick={handleBack}
         />
-      </div> */}
-      <div className="bg-[#f5f5f5] px-10 py-10 h-screen flex flex-col justify-center items-center font-figtree">
-        <div className="h-1/2   w-1/2  bg-oren/80 rounded-t-xl "></div>
-        {/* div bawah */}
-        <div className="h-1/2 bg-white flex flex-col items-center  w-1/2 rounded-b-xl">
-          {/* card start */}
-          <div className="bg-white w-max h-max flex flex-col py-6 px-6 gap-6  -mt-16 rounded-xl shadow-md">
-            <div className="  flex flex-row justify-center items-center gap-40">
-              <div className="flex flex-row justify-center items-center gap-6">
-                <Image
-                  src="/home/default_profile.png"
-                  alt="Profile"
-                  width={76}
-                  height={76}
-                  className="rounded-full object-cover border border-white/20"
-                />
-                <h2 className="capitalize text-xl font-semibold">
-                  {user?.name}
-                </h2>
-              </div>
-              {/*  */}
-              <div>
-                <p className="uppercase bg-oren px-4 py-2 rounded-full text-white">
-                  {user?.role}
-                </p>
-              </div>
-            </div>
+      </div>
+
+      <div className="bg-oren/80 h-48 w-full flex justify-center items-end">
+        <div className="bg-white w-11/12 md:w-2/3 lg:w-1/2 p-6 rounded-xl shadow-md flex justify-between items-center -mb-12">
+          <div className="flex items-center gap-4">
+            <Image
+              src="/home/default_profile.png"
+              alt="Profile"
+              width={76}
+              height={76}
+              className="rounded-full border shadow-sm"
+            />
+            <h2 className="text-xl font-bold capitalize">
+              {user?.name || "Loading..."}
+            </h2>
           </div>
-          {/* card end */}
-          <div className="flex flex-row">
-            <div>
-              <h1>Dashboard</h1>
-              <p>Email : </p>
+          <span className="bg-oren text-white px-4 py-1 rounded-full text-sm uppercase">
+            {user?.role}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-20 flex justify-center border-b border-gray-200 bg-white">
+        <button
+          onClick={() => setActiveTab("dashboard")}
+          className={`px-8 py-3 font-semibold transition-all duration-300 ${
+            activeTab === "dashboard"
+              ? "border-b-4 border-green-500 text-green-600"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Dashboard
+        </button>
+        <button
+          onClick={() => setActiveTab("activity")}
+          className={`px-8 py-3 font-semibold transition-all duration-300 ${
+            activeTab === "activity"
+              ? "border-b-4 border-green-500 text-green-600"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Activity
+        </button>
+      </div>
+
+      <div className="p-10 flex justify-center">
+        <div className="w-full max-w-5xl">
+          {activeTab === "dashboard" ? (
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <h3 className="text-lg font-bold mb-4">User Information</h3>
+              <div className="space-y-4">
+                <div className="flex flex-col">
+                  <span className="text-gray-400 text-xs uppercase font-bold">
+                    Email
+                  </span>
+                  <span className="text-gray-700">{user?.email || "-"}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-gray-400 text-xs uppercase font-bold">
+Address                  </span>
+                  <span className="text-gray-700 capitalize">
+                    {user?.siswa?.alamat || "-"}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h1>Activity</h1>
-              <p>Histori Pembelian</p>
+          ) : (
+            <div className="animate-fadeIn">
+              <TransaksiContent />
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

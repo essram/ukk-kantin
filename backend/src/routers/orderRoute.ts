@@ -10,7 +10,7 @@ app.get(`/`, [verifyToken, verifyRole(["SISWA", "ADMIN_STAN"])], getAllOrders)
 app.get(`/history`, [verifyToken, verifyRole(["SISWA", "ADMIN_STAN"])], getAllHistory)
 app.get(`/history/:id`, [verifyToken, verifyRole(["SISWA", "ADMIN_STAN"])], getHistoryById)
 app.post(`/`, [verifyToken, verifyRole(["SISWA"]), verifyAddOrder], createOrder)
-app.put(`/:id`, [verifyToken, verifyRole(["SISWA"])], updateStatusById)
+app.put(`/:id`, [verifyToken, verifyRole(["SISWA", "ADMIN_STAN"])], updateStatusById)
 app.get(`/:id`, [verifyToken, verifyRole(["SISWA"])], getOrderById)
 app.delete(`/:id`, [verifyToken, verifyRole(["ADMIN_STAN"])], deleteOrder)
 

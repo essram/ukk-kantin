@@ -9,6 +9,7 @@ import { get, put } from "@/lib/api-bridge";
 import { getCookies } from "@/lib/server-cookies";
 import { BASE_API_URL } from "@/global";
 import { OrderResponse } from "@/app/types";
+import Sidebar from "@/components/sidebar";
 
 pdfMake.vfs = pdfFonts.vfs;
 
@@ -117,8 +118,15 @@ export default function Details() {
     pdfMake.createPdf(docDefinition).download(`Invoice_${order.id}.pdf`);
   };
 
+    const itemsTotal = order ? order.transaction_detail.reduce((sum, item) => sum + item.quantity * item.price, 0) : 0;
+
+
   return order ? (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="flex h-screen">
+      <Sidebar />
+      
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg m-4">
       <button
         onClick={() => router.back()}
         className="flex items-center text-hitamGaHitam hover:text-hitamGaHitam/60 transition-all mb-4"
@@ -145,11 +153,11 @@ export default function Details() {
       <div className="mt-4">
         <h3 className="text-lg font-semibold">Total Price</h3>
         <p className="text-xl font-bold text-right">
-          {formatRupiah(order.total_price)}
+         {formatRupiah(itemsTotal)}
         </p>
       </div>
       <div className="mt-4">
-        <h3 className="text-lg font-semibold">Status</h3>
+        <h3 className="text-lg font-semibold">Payment Status</h3>
         <select
           className="w-full p-2 border rounded mt-2"
           value={paymentStatus}
@@ -160,14 +168,17 @@ export default function Details() {
           <option value="CANCELED">Cancelled</option>
           <option value="BELUM_LUNAS">Belum Lunas</option>
         </select>
+
+        <h3 className="text-lg font-semibold mt-4">Order Status</h3>
         <select
           className="w-full p-2 border rounded mt-2"
           value={orderStatus}
           onChange={(e) => setOrderStatus(e.target.value)}
         >
-          <option value="NEW">New</option>
-          <option value="PAID">Paid</option>
-          <option value="DONE">Done</option>
+          <option value="PENDING">Pending</option>
+          <option value="PREPARED">Prepared</option>
+          <option value="DELIVERY">Delivery</option>
+          <option value="DELIVERED">Delivered</option>
         </select>
       </div>
       <div className="mt-4 flex space-x-4">
@@ -184,8 +195,15 @@ export default function Details() {
           Download Invoice
         </button>
       </div>
+        </div>
+      </main>
     </div>
   ) : (
-    <p className="text-center text-gray-500">Loading order data...</p>
+    <div className="flex h-screen">
+      <Sidebar />
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-center text-gray-500">Loading order data...</p>
+      </div>
+    </div>
   );
 }

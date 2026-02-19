@@ -309,19 +309,16 @@ const MenuPage = () => {
   };
 
   return (
-    <div className="flex py-24">
+    <div className="flex py-24 flex-col md:flex-row">
       <Navbar />
-      <div className={` px-8 py-2 ${checkoutOpen ? "w-[71.5%]" : "w-full"} `}>
+      <div className={`px-4 sm:px-8 py-2 ${checkoutOpen ? "lg:w-[71.5%] md:w-[65%] w-full" : "w-full"}`}>
         <DatePickerComponent />
-        {/* time end */}
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-nowrap overflow-x-auto pb-2">
           <div
             className={`flex flex-col ${
-              selectedCategory === "all"
-                ? "border-2 border-orange-500"
-                : "bg-white"
-            } w-60 h-32 px-4 py-2 rounded-lg my-5 bg-orange-500/5 justify-center`}
+              selectedCategory === "all" ? "border-2 border-orange-500" : "bg-white"
+            } w-44 sm:w-48 md:w-60 h-28 sm:h-32 px-3 sm:px-4 py-2 rounded-lg my-5 bg-orange-500/5 justify-center flex-shrink-0`}
             onClick={() => handleSelectCategory("all")}
           >
             <div
@@ -349,10 +346,8 @@ const MenuPage = () => {
           {categoryData?.map((item: any) => (
             <div
               className={`flex flex-col ${
-                selectedCategory === item.id
-                  ? "border-2 border-orange-500"
-                  : "bg-white"
-              } w-60 h-32 px-4 py-2 rounded-lg my-5 bg-orange-500/5 justify-center`}
+                selectedCategory === item.id ? "border-2 border-orange-500" : "bg-white"
+              } w-44 sm:w-48 md:w-60 h-28 sm:h-32 px-3 sm:px-4 py-2 rounded-lg my-5 bg-orange-500/5 justify-center flex-shrink-0`}
               onClick={() => handleSelectCategory(item.id)}
               key={item.id}
             >
@@ -390,9 +385,7 @@ const MenuPage = () => {
           <div className="flex items-center w-full flex-grow">
             <Search url={`/siswa/menuOrder`} search={search} />
           </div>
-          {/* <div className="ml-4">
-          <AddMenu />
-        </div> */}
+         
         </div>
 
         {loading ? (
@@ -400,9 +393,9 @@ const MenuPage = () => {
         ) : menu.length === 0 && !loading ? (
           <Alert>No data available</Alert>
         ) : (
-          <div className=" flex flex-wrap justify-center gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center w-full">
             {menu.map((data, index) => (
-              <div key={index} className=" shadow m-2">
+              <div key={index} className="shadow m-2 w-40 sm:w-44 md:w-52 lg:w-60">
                 <CardMenu
                   id={data.id}
                   image={data.picture}
@@ -419,7 +412,7 @@ const MenuPage = () => {
         )}
       </div>
       {checkoutOpen && (
-        <div className="w-[28.5%] bg-white shadow-sm rounded-lg text-hitamGaHitam font-poppins flex flex-col h-screen relative">
+        <div className="lg:w-[28.5%] md:w-[35%] w-full bg-white shadow-sm rounded-lg text-hitamGaHitam font-poppins flex flex-col md:h-screen h-auto relative">
           <div className="p-4 flex-none">
             <div className="flex w-full items-center">
               <div
@@ -436,7 +429,7 @@ const MenuPage = () => {
                   <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z" />
                 </svg>
               </div>
-              <div className="ml-16 w-40 flex flex-col justify-center">
+              <div className="ml-8 sm:ml-16 w-40 sm:w-44 flex flex-col justify-center">
                 <form action="" onSubmit={handleSubmit}>
                   <input
                     placeholder="Customer Name"
@@ -448,22 +441,10 @@ const MenuPage = () => {
               </div>
             </div>
             <div className="flex justify-between my-4">
-              {/* <select
-                name="noMeja"
-                className="bg-[#f7f7f7] py-2 px-3 my-2 rounded-full w-36"
-                onChange={handleChange}
-                value={selectedNoMeja}
-              >
-                <option value="0">Select Table</option>
-                {noMeja.map((data, index) => (
-                  <option value={data.id} key={index}>
-                    Table {data.nomor}
-                  </option>
-                ))}
-              </select> */}
+             
 
               <select
-                className="bg-[#f7f7f7] py-2 px-3 my-2 rounded-full w-36"
+                className="bg-[#f7f7f7] py-2 px-3 my-2 rounded-full w-28 sm:w-36"
                 onChange={handleChangePlace}
                 value={selectedPlace}
               >
@@ -477,7 +458,7 @@ const MenuPage = () => {
           <div className="p-4 flex-1 overflow-y-auto">
             {orderMenu.map((data, index) => (
               <div className="h-max flex p-2" key={index}>
-                <div className="bg-[#f7f7f7] p-5 w-44 h-32 rounded-lg">
+                <div className="bg-[#f7f7f7] p-4 sm:p-5 w-36 sm:w-44 h-28 sm:h-32 rounded-lg">
                   <Image
                     src={
                       data.image

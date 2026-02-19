@@ -43,7 +43,7 @@ export default function Navbar() {
     setIsLoggedIn(false);
     setIsOpen(false);
 
-    router.push("/login");
+    router.push("/auth/login  ");
   };
 
   const handleMenuClick = (e: React.MouseEvent) => {
@@ -89,13 +89,13 @@ export default function Navbar() {
           {!isLoggedIn ? (
             <>
               <Link
-                href="/login"
+                href="/auth/login"
                 className="bg-oren px-5 py-2 rounded-xl hover:bg-oren/80 transition-all"
               >
                 Login
               </Link>
               <Link
-                href="/register"
+                href="/auth/register"
                 className="ml-4 bg-white text-black px-5 py-2 rounded-xl hover:bg-white/80 transition-all"
               >
                 Register
@@ -125,7 +125,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* hamburger */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="md:hidden focus:outline-none"

@@ -7,22 +7,21 @@ export default function footerSection() {
         <div className="lg:basis-2/5">
           <div className="flex flex-row items-center">
             <Image src="/logo/Logo.png" alt="logo" width={52} height={52} />
-            <h1 className="uppercase text-white font-bold text-2xl ml-4">
-              fooder
+            <h1 className=" text-white font-bold text-2xl ml-4">
+              NomNom
             </h1>
           </div>
 
           <p className="text-[#f5f5f5] tracking-wide capitalize my-6 text-sm leading-6">
-            our job is to filling your tummy <br />
-            with delicious food and with fast <br />
-            and free delivery.
+            filling your tummy <br />
+            with delicious food.<br />
+            
           </p>
 
           <div className="flex flex-row gap-6">
             <Image src="/home/instagram.png" alt="" width={22} height={22} />
             <Image src="/home/twitter.png" alt="" width={22} height={22} />
-            <Image src="/home/email.jpg" alt="" width={22} height={22} />
-          </div>
+                      </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 w-full">
@@ -39,7 +38,7 @@ export default function footerSection() {
           <div>
             <h1 className="text-white font-bold text-xl pt-2">Company</h1>
             <div className="pt-6 text-[#f5f5f5] capitalize">
-              <p className="footer-link">why fooder?</p>
+              <p className="footer-link">why nomNom?</p>
               <p className="footer-link">partner with us</p>
               <p className="footer-link uppercase">FAQ</p>
               <p className="footer-link">blog</p>
@@ -73,7 +72,7 @@ export default function footerSection() {
                 />
                 <button
                   type="submit"
-                  className="ml-3 bg-orange-500 hover:bg-orange-600 transition rounded-full p-2 flex items-center justify-center"
+                  className="ml-3 hover:bg-white transition rounded-full p-2 flex items-center justify-center"
                 >
                   <Image
                     src="/home/send.png"

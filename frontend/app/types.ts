@@ -1,4 +1,3 @@
-import { Stringifier } from "postcss";
 
 export interface IMenu {
   id: number;
@@ -11,6 +10,7 @@ export interface IMenu {
   id_category: number;
   createdAt: string;
   updatedAt: string;
+  stock: number;
   diskon?: IDiskon | null;
   finalPrice?: number;
 }
@@ -35,6 +35,10 @@ export interface IUser {
   role: string;
   createdAt: string;
   updatedAt: string;
+  siswa?: {
+    alamat: string;
+    telp: string;
+  };
 }
 
 export interface IStan {
@@ -42,6 +46,7 @@ export interface IStan {
   uuid: string;
   nama: string;
   nama_pemilik: string;
+  image: string;
   no_telp: string;
 }
 
@@ -118,6 +123,7 @@ export interface OrderResponse {
   customer: string;
   table_number: number;
   total_price: number;
+  final_price: number;
   status: string;
   createdAt: string;
   updatedAt: string;

@@ -79,7 +79,7 @@ const AddDiskonMenu = ({ menu, onSuccess }: Props) => {
               <button
                 disabled={!selectedDiskon}
                 onClick={submit}
-                className="px-3 py-1 text-sm rounded bg-primary text-white disabled:opacity-50"
+                className="px-3 py-1 text-sm rounded bg-primary bg-oren text-white cursor-pointer"
               >
                 Simpan
               </button>

@@ -85,7 +85,7 @@ const AddMenu = () => {
       const payload = new FormData();
       payload.append("name", name || "");
       payload.append("price", price !== undefined ? price.toString() : "0");
-      payload.append("category", id_category.toString() || '');
+      payload.append("category", id_category != null ? id_category.toString() : "");
       payload.append("description", description || "");
       payload.append("stan_id", getCookie("stan_id") || "");
       if (file !== null) payload.append("picture", file || "");
@@ -187,7 +187,7 @@ const AddMenu = () => {
             <InputGroupComponent
               id={`price`}
               type="number"
-              value={menu.price.toString()}
+              value={menu.price != null ? menu.price.toString() : ""}
               onChange={(val) => setMenu({ ...menu, price: Number(val) })}
               required={true}
               label="Price"
@@ -204,7 +204,7 @@ const AddMenu = () => {
 
             <Select
               id={`category`}
-              value={menu.id_category.toString()}
+              value={menu.id_category != null ? menu.id_category.toString() : ""}
               label="Category"
               required={true}
               onChange={(val) => setMenu({ ...menu, id_category: parseInt(val) })}

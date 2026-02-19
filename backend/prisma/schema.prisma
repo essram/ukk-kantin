@@ -31,6 +31,7 @@ model menu {
   id_category        Int
   picture            String               @default("")
   description        String               @default("") @db.Text
+  stock              Int                  @default(0)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @default(now())
   transaction_detail transaction_detail[]
@@ -98,6 +99,8 @@ model user {
   role            user_role   @default(SISWA)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @default(now())
+  nama_pemilik    String?
+  alamat          String?
   order           order[]
   admin_stan      admin_stan?
   siswa           siswa?
@@ -137,12 +140,12 @@ model Category {
 }
 
 model diskon {
-  id                Int    @id @default(autoincrement())
-  nama_diskon       String @db.VarChar(50)
+  id                Int           @id @default(autoincrement())
+  nama_diskon       String        @db.VarChar(50)
   persentase_diskon Int
-  tanggal_awal  DateTime
-  tanggal_akhir DateTime
-  menu_diskon   menu_diskon[]
+  tanggal_awal      DateTime
+  tanggal_akhir     DateTime
+  menu_diskon       menu_diskon[]
 }
 
 model menu_diskon {

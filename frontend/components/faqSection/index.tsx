@@ -48,8 +48,6 @@ export default function FAQSection() {
   return (
     <section className="bg-[#111418] py-28 h-[77%]">
       <div className="max-w-6xl mx-auto px-6">
-
-        {/* Title */}
         <motion.h2
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -60,18 +58,15 @@ export default function FAQSection() {
           Frequently Asked Questions
         </motion.h2>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-
-          {/* Column Left */}
           <div className="space-y-4">
             <FAQItem
-              question="Is SakPole free to use?"
-              answer="Yes. SakPole is completely free for users. You only pay for the food you order."
+              question="Is NomNom free to use?"
+              answer="Yes. NomNom is completely free for users. You only pay for the food you order."
             />
             <FAQItem
               question="Is it available in other languages?"
-              answer="Currently, SakPole supports Indonesian and English. More languages are coming soon."
+              answer="Currently, NomNom only supports English. More languages are coming soon."
             />
             <FAQItem
               question="Can I use it offline?"
@@ -79,7 +74,6 @@ export default function FAQSection() {
             />
           </div>
 
-          {/* Column Right */}
           <div className="space-y-4">
             <FAQItem
               question="Can I order food online?"
@@ -94,7 +88,6 @@ export default function FAQSection() {
               answer="We support both cash and digital payment methods for your convenience."
             />
           </div>
-
         </div>
       </div>
     </section>

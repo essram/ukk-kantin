@@ -59,7 +59,6 @@ const MenuPage = () => {
         This page displays menu data, allowing users to view details, search, and manage menu items.
       </p>
 
-      {/* Search Bar */}
       <div className="flex gap-3 mb-6">
         <div className="w-[90%] mr-2">
 
@@ -68,7 +67,6 @@ const MenuPage = () => {
         <AddMenu className="ml-4" />
       </div>
 
-      {/* Alert jika data kosong */}
       {menu.length === 0 ? (
         <Alert>No data available</Alert>
       ) : (

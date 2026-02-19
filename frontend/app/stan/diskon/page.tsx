@@ -51,8 +51,8 @@ const CreateDiskonPage = () => {
     <div className="flex min-h-screen bg-gray-100 font-figtree">
       <Sidebar />
 
-      <main className="flex-1 p-4">
-        <div className="bg-white rounded-lg p-4 border-t-4 border-t-primary shadow-md max-w-xl">
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="bg-white rounded-xl p-6 border-t-4 border-t-primary shadow-md w-full max-w-xl">
           <h4 className="text-xl font-bold mb-2">Buat Diskon</h4>
           <p className="text-sm text-secondary mb-4">
             Halaman ini digunakan untuk membuat diskon menu.
@@ -108,7 +108,7 @@ const CreateDiskonPage = () => {
             <button
               disabled={loading}
               onClick={submit}
-              className="bg-primary hover:bg-primary/90 text-black px-4 py-2 rounded disabled:opacity-50"
+              className="bg-oren hover:bg-primary/90 text-white px-4 py-2 rounded disabled:opacity-50"
             >
               {loading ? "Menyimpan..." : "Simpan Diskon"}
             </button>

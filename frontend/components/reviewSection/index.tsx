@@ -71,10 +71,7 @@ export default function ReviewSection() {
                           text-sm md:text-base leading-relaxed tracking-wide"
             >
               <span className="font-bold text-2xl leading-none"> &ldquo; </span>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              Pecel kantin 11 enak banget, asli cocok banget buat sarapan pagi2, apalagi ditambah sama teh hangatnya, beh... ga ada tandingannya.
               <span className="font-bold text-2xl leading-none"> &rdquo; </span>
             </p>
 
@@ -82,7 +79,7 @@ export default function ReviewSection() {
               <div className="flex flex-row mt-6 items-center">
                 <div className="w-[55px] h-[55px] md:w-[65px] md:h-[65px] rounded-full overflow-hidden shadow-sm">
                   <Image
-                    src="/home/rate2.jpg"
+                    src="/home/rate2.jpeg"
                     alt="orang"
                     width={65}
                     height={65}
@@ -92,10 +89,10 @@ export default function ReviewSection() {
 
                 <div className="flex flex-col my-2 mx-3 font-figtree">
                   <h2 className="text-hitamGaHitam font-semibold tracking-wide">
-                    Bruno Minor
+                    Rama Esa
                   </h2>
                   <p className="text-itemCoklat text-sm tracking-wide pt-1">
-                    Food Vlogger
+                       12 RPL 5 
                   </p>
                 </div>
               </div>

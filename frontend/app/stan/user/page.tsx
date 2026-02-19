@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import AddUser from "@/components/user/AddUser";
 import EditUser from "@/components/user/EditUser";
 import DeleteUser from "@/components/user/DeleteUser";
+import Sidebar from "@/components/sidebar";
 
 const getUser = async (search: string): Promise<IUser[]> => {
   try {
@@ -59,8 +60,12 @@ const UserPage = () => {
   };
 
   return (
-    <div className="m-2 bg-white rounded-lg p-3 font-poppins">
-      <h4 className="text-2xl font-bold mt-4 mb-2 text-center">User Data</h4>
+    <div className="flex min-h-screen bg-gray-100 font-poppins">
+      <Sidebar />
+
+      <main className="flex-1 p-4">
+        <div className="bg-white rounded-lg p-4 border-t-4 border-t-primary shadow-md">
+          <h4 className="text-2xl font-bold mb-2">User Data</h4>
       {/* <p className="text-sm text-secondary mb-4">
         This page displays uiser data, allowing user to view details, search,
         and manage user items by adding, editing, or deleting them.
@@ -139,7 +144,7 @@ const UserPage = () => {
             </div>
           ))}
         </div>
-      )}
+      </main>
     </div>
   );
 };

@@ -81,21 +81,32 @@ const MenuPage = () => {
           {menu.length === 0 ? (
             <Alert>No data available</Alert>
           ) : (
-            <div>
+
+<div>
               {menu.map((data, index) => (
                 <div
                   key={`keyMenu${index}`}
-                  className="flex flex-wrap shadow m-2 rounded-lg"
+                  className="flex flex-wrap shadow m-2 rounded-lg items-start"
                 >
-                  <div className="w-full md:w-1/12 p-2">
-                    <small className="font-bold text-primary">Picture</small>
-                    <Image
-                      width={40}
-                      height={40}
-                      src={`${BASE_IMAGE_MENU}/${data.picture}`}
-                      className="rounded-sm"
-                      alt="preview"
-                      unoptimized
+                  <div className="w-full md:w-1/12 p-2 flex flex-col items-start gap-2">
+                    <div>
+                      <small className="font-bold text-primary">Picture</small>
+                      <Image
+                        width={40}
+                        height={40}
+                        src={`${BASE_IMAGE_MENU}/${data.picture}`}
+                        className="rounded-sm"
+                        alt="preview"
+                        unoptimized
+                      />
+                    </div>
+
+                    <AddDiskonMenu
+                      menu={data}
+                      onSuccess={async () => {
+                        const result = await getMenu(search);
+                        setMenu(result);
+                      }}
                     />
                   </div>
 
@@ -111,12 +122,9 @@ const MenuPage = () => {
 
                     {data.diskon && data.diskon.is_active ? (
                       <div>
-                        {/* harga asli dicoret */}
                         <p className="text-sm text-gray-400 line-through">
                           Rp {data.price.toLocaleString("id-ID")}
                         </p>
-
-                        {/* harga setelah diskon */}
                         <p className="text-base font-bold text-red-600">
                           Rp{" "}
                           {calculateDiscountPrice(
@@ -124,8 +132,6 @@ const MenuPage = () => {
                             data.diskon.persentase_diskon,
                           ).toLocaleString("id-ID")}
                         </p>
-
-                        {/* badge diskon */}
                         <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
                           -{data.diskon.persentase_diskon}%
                         </span>
@@ -154,15 +160,10 @@ const MenuPage = () => {
                   <div className="w-full md:w-2/12 p-2">
                     <small className="font-bold text-primary">Action</small>
                     <br />
-                    <AddDiskonMenu
-                      menu={data}
-                      onSuccess={async () => {
-                        const result = await getMenu(search);
-                        setMenu(result);
-                      }}
-                    />
-                    <EditMenu selectedMenu={data} />
-                    <DeleteMenu selectedMenu={data} />
+                    <div className="flex flex-col gap-1">
+                      <EditMenu selectedMenu={data} />
+                      <DeleteMenu selectedMenu={data} />
+                    </div>
                   </div>
                 </div>
               ))}

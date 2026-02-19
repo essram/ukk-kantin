@@ -41,21 +41,19 @@ export const getAllMenus = async (req: Request, res: Response) => {
       const activeDiskons = menu.menu_diskon
         .filter(
           (md) =>
-            md.diskon.tanggal_awal <= now &&
-            md.diskon.tanggal_akhir >= now
+            md.diskon.tanggal_awal <= now && md.diskon.tanggal_akhir >= now,
         )
         .map((md) => md.diskon);
 
       const bestDiskon =
         activeDiskons.length > 0
           ? activeDiskons.reduce((max, curr) =>
-              curr.persentase_diskon > max.persentase_diskon ? curr : max
+              curr.persentase_diskon > max.persentase_diskon ? curr : max,
             )
           : null;
 
       const finalPrice = bestDiskon
-        ? menu.price -
-          (menu.price * bestDiskon.persentase_diskon) / 100
+        ? menu.price - (menu.price * bestDiskon.persentase_diskon) / 100
         : menu.price;
 
       return {
@@ -82,7 +80,6 @@ export const getAllMenus = async (req: Request, res: Response) => {
     });
   }
 };
-
 
 export const createMenu = async (request: Request, response: Response) => {
   try {
@@ -180,41 +177,49 @@ export const updateMenu = async (request: Request, response: Response) => {
   }
 };
 
-export const deleteMenu = async (request: Request, response: Response) => {
+export const deleteMenu = async (req: Request, res: Response) => {
   try {
-    /** get id of menu's id that sent in parameter of URL */
-    const { id } = request.params;
+    const { id } = req.params;
 
-    /** make sure that data is exists in database */
-    const findMenu = await prisma.menu.findFirst({ where: { id: Number(id) } });
-    if (!findMenu)
-      return response
-        .status(200)
-        .json({ status: false, message: `Menu is not found` });
+    const menuId = Number(id);
 
-    /** check the old picture in the folder */
-    let path = `${BASE_URL}/../public/menu_picture/${findMenu.picture}`;
-    let exists = fs.existsSync(path);
-    /** delete the old exists picture if reupload new file */
-    if (exists && findMenu.picture !== ``) fs.unlinkSync(path);
-
-    /** process to delete menu's data */
-    const deletedMenu = await prisma.menu.delete({
-      where: { id: Number(id) },
+    const findMenu = await prisma.menu.findFirst({
+      where: { id: menuId },
     });
-    return response
-      .json({
-        status: true,
-        data: deletedMenu,
-        message: `Menu has deleted`,
-      })
-      .status(200);
-  } catch (error) {
-    return response
-      .json({
+
+    if (!findMenu) {
+      return res.status(404).json({
         status: false,
-        message: `There is an error. ${error}`,
-      })
-      .status(400);
+        message: "Menu not found",
+      });
+    }
+
+    await prisma.menu_diskon.deleteMany({
+      where: { id_menu: menuId },
+    });
+
+    await prisma.transaction_detail.deleteMany({
+      where: { menuId },
+    });
+
+    const path = `${BASE_URL}/../public/menu_picture/${findMenu.picture}`;
+    if (fs.existsSync(path) && findMenu.picture !== "") {
+      fs.unlinkSync(path);
+    }
+
+    const deletedMenu = await prisma.menu.delete({
+      where: { id: menuId },
+    });
+
+    return res.status(200).json({
+      status: true,
+      data: deletedMenu,
+      message: "Menu has been deleted",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: false,
+      message: `There is an error. ${error}`,
+    });
   }
 };

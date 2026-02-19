@@ -4,8 +4,7 @@ import { iCategory, IMenu } from "@/app/types";
 import { BASE_API_URL } from "@/global";
 import { get, put } from "@/lib/api-bridge";
 import { getCookie } from "@/lib/client-cookies";
-import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, FormEvent } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import {
   ButtonPrimary,
@@ -16,207 +15,194 @@ import { InputGroupComponent } from "@/components/InputComponent";
 import Modal from "@/components/modal";
 import Select from "@/components/select";
 import FileInput from "@/components/fileInput";
-import { getCookies } from "@/lib/server-cookies";
 
 const EditMenu = ({ selectedMenu }: { selectedMenu: IMenu }) => {
-  const [isShow, setIsShow] = useState<boolean>(false);
-  const [menu, setMenu] = useState<IMenu>({ ...selectedMenu });
-    const [categoryData, setCategoryData] = useState<iCategory[]>([]);
+  const [isShow, setIsShow] = useState(false);
 
-  const TOKEN = getCookie("token") || "";
+  const [menu, setMenu] = useState({
+    id: selectedMenu.id,
+    name: selectedMenu.name,
+    price: selectedMenu.price,
+    description: selectedMenu.description,
+    id_category: selectedMenu.category?.id || 0,
+  });
+
+  const [categoryData, setCategoryData] = useState<iCategory[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const TOKEN = getCookie("token") || "";
+
   const openModal = () => {
-    setMenu({ ...selectedMenu });
+    setMenu({
+      id: selectedMenu.id,
+      name: selectedMenu.name,
+      price: selectedMenu.price,
+      description: selectedMenu.description,
+      id_category: selectedMenu.category?.id || 0,
+    });
+
+    setFile(null);
     setIsShow(true);
+
     if (formRef.current) formRef.current.reset();
   };
+
   const handleSubmit = async (e: FormEvent) => {
     try {
       e.preventDefault();
-      const url = `${BASE_API_URL}/menu/${selectedMenu.id}`;
-      const { name, price, description, category } = menu;
+
+      const url = `${BASE_API_URL}/menu/${menu.id}`;
+
       const payload = new FormData();
-      payload.append("name", name || "");
-      payload.append("price", price !== undefined ? price.toString() : "0");
-      payload.append("description", description || "");
-      payload.append("category", category || "");
-      if (file !== null) payload.append("picture", file || "");
+      payload.append("name", menu.name);
+      payload.append("price", menu.price.toString());
+      payload.append("description", menu.description);
+      payload.append("category", menu.id_category.toString());
+
+      if (file) {
+        payload.append("picture", file);
+      }
+
       const { data } = await put(url, payload, TOKEN);
+
       if (data?.status) {
         setIsShow(false);
-        toast(data?.message, {
+
+        toast(data.message, {
           hideProgressBar: true,
-          containerId: `toastMenu`,
-          type: `success`,
+          containerId: "toastMenu",
+          type: "success",
         });
+
         setTimeout(() => window.location.reload(), 500);
       } else {
-        toast(data?.message, {
+        toast(data?.message || "Update failed", {
           hideProgressBar: true,
-          containerId: `toastMenu`,
-          type: `warning`,
+          containerId: "toastMenu",
+          type: "warning",
         });
       }
     } catch (error) {
       console.log(error);
-      toast(`Something Wrong`, {
+      toast("Something went wrong", {
         hideProgressBar: true,
-        containerId: `toastMenu`,
-        type: `error`,
+        containerId: "toastMenu",
+        type: "error",
       });
     }
   };
 
-   const GetDataCategory = async (): Promise<iCategory[]> => {
-      try {
-        const TOKEN = (await getCookies("token")) ?? "";
-        const url = `${BASE_API_URL}/category/items`;
-        const { data } = await get(url, TOKEN);
-        let result: iCategory[] = [];
-        if (data?.status) result = [...data.data];
-        return result;
-      } catch (error) {
-        console.log(error);
-        return [];
+  const fetchCategory = async () => {
+    try {
+      const url = `${BASE_API_URL}/category/items`;
+      const { data } = await get(url, TOKEN);
+
+      if (data?.status) {
+        setCategoryData(data.data);
       }
-    };
-    useEffect(() => {
-      const fetchData = async () => {;
-        const resultDataCategory = await GetDataCategory();
-        setCategoryData(resultDataCategory);
-      };
-      fetchData();
-    }, []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategory();
+  }, []);
+
   return (
     <div>
-      <ToastContainer containerId={`toastMenu`} />
-      <ButtonInfo type="button" onClick={() => openModal()}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-4"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-          />
-        </svg>
+      <ToastContainer containerId="toastMenu" />
+
+      <ButtonInfo type="button" onClick={openModal}>
+        Edit
       </ButtonInfo>
+
       <Modal isShow={isShow} onClose={(state) => setIsShow(state)}>
-        <form onSubmit={handleSubmit}>
-          {/* modal header */}
+        <form ref={formRef} onSubmit={handleSubmit}>
           <div className="sticky top-0 bg-white px-5 pt-5 pb-3 shadow">
-            <div className="w-full flex items-center">
-              <div className="flex flex-col">
-                <strong className="font-bold text-2xl">Update Menu</strong>
-                <small className="text-slate-400 text-sm">
-                  Managers can update both Cashier and Manager roles on this
-                  page.
-                </small>
-              </div>
-              <div className="ml-auto">
-                <button
-                  type="button"
-                  className="text-slate-400"
-                  onClick={() => setIsShow(false)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18 18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
+            <strong className="text-2xl">Update Menu</strong>
           </div>
-          {/* end modal header */}
 
-          {/* modal body */}
-          <div className="p-5">
+          <div className="p-5 space-y-4">
             <InputGroupComponent
-              id={`name`}
+              id="name"
               type="text"
-              value={menu.name}
-              onChange={(val) => setMenu({ ...menu, name: val })}
-              required={true}
               label="Name"
+              value={menu.name}
+              required
+              onChange={(val) =>
+                setMenu({ ...menu, name: val })
+              }
             />
 
             <InputGroupComponent
-              id={`price`}
+              id="price"
               type="number"
-              value={menu.price.toString()}
-              onChange={(val) => setMenu({ ...menu, price: Number(val) })}
-              required={true}
               label="Price"
+              value={menu.price.toString()}
+              required
+              onChange={(val) =>
+                setMenu({ ...menu, price: Number(val) })
+              }
             />
 
             <InputGroupComponent
-              id={`description`}
+              id="description"
               type="text"
-              value={menu.description}
-              onChange={(val) => setMenu({ ...menu, description: val })}
-              required={true}
               label="Description"
+              value={menu.description}
+              required
+              onChange={(val) =>
+                setMenu({ ...menu, description: val })
+              }
             />
 
             <Select
-              id={`category`}
-              value={menu.category?.id.toString() || ""}
+              id="category"
               label="Category"
-              required={true}
-              onChange={(val) => setMenu({ ...menu, category: val })}
+              value={menu.id_category.toString()}
+              required
+              onChange={(val) =>
+                setMenu({ ...menu, id_category: Number(val) })
+              }
             >
               <option value="">--- Select Category ---</option>
-               {categoryData.map((category) => (
-              <option value={category.id} key={category.id}>{category.name}</option>
-                
+              {categoryData.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
               ))}
             </Select>
 
             <FileInput
+              id="picture"
+              label="Upload Photo (Optional)"
               acceptTypes={[
-                "application/pdf",
                 "image/png",
                 "image/jpeg",
                 "image/jpg",
               ]}
-              id="profile_picture"
-              label="Unggah Foto (Max 2MB, PDF/JPG/JPEG/PNG)"
               onChange={(f) => setFile(f)}
               required={false}
             />
           </div>
-          {/* end modal body */}
 
-          {/* modal footer */}
-          <div className="w-full p-5 flex rounded-b-2xl shadow">
-            <div className="flex ml-auto gap-2">
-              <ButtonDanger type="button" onClick={() => setIsShow(false)}>
-                Cancel
-              </ButtonDanger>
-              <ButtonPrimary type="submit">Save</ButtonPrimary>
-            </div>
+          <div className="flex justify-end gap-2 p-5">
+            <ButtonDanger
+              type="button"
+              onClick={() => setIsShow(false)}
+            >
+              Cancel
+            </ButtonDanger>
+            <ButtonPrimary type="submit">
+              Save
+            </ButtonPrimary>
           </div>
-          {/* end modal footer */}
         </form>
       </Modal>
     </div>
   );
 };
+
 export default EditMenu;

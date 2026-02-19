@@ -35,7 +35,6 @@ export default function FoodCategorySection() {
             className="rounded-lg pb-4 w-[200px] sm:w-[220px] md:w-[250px] h-auto"
           />
           <h3 className="text-xl sm:text-2xl font-semibold">Food</h3>
-          <p className="font-figtree py-1 text-sm">stock</p>
         </div>
 
         <div className="flex flex-col items-center">
@@ -47,7 +46,6 @@ export default function FoodCategorySection() {
             className="rounded-lg pb-4 w-[200px] sm:w-[220px] md:w-[250px] h-auto"
           />
           <h3 className="text-xl sm:text-2xl font-semibold">Drink</h3>
-          <p className="font-figtree py-1 text-sm">stock</p>
         </div>
 
         <div className="flex flex-col items-center">
@@ -59,7 +57,6 @@ export default function FoodCategorySection() {
             className="rounded-lg pb-4 w-[200px] sm:w-[220px] md:w-[250px] h-auto"
           />
           <h3 className="text-xl sm:text-2xl font-semibold">Snack</h3>
-          <p className="font-figtree py-1 text-sm">stock</p>
         </div>
       </div>
     </div>

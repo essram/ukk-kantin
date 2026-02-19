@@ -10,6 +10,7 @@ import Alert from "@/components/alert/page";
 import Link from "next/link";
 import { format } from "date-fns";
 import Cookies from "js-cookie";
+import Sidebar from "@/components/sidebar";
 
 const getHistory = async (search: string, idStan: number): Promise<OrderResponse[]> => {
   try {
@@ -22,28 +23,87 @@ const getHistory = async (search: string, idStan: number): Promise<OrderResponse
     return [];  
   }
 };
+
+const formatRupiah = (number: number) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(number);
+};
+
 const TransaksiPage = () => {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
   const stan_id = Cookies.get("stan_id") || 0;
 
   const [history, setHistory] = useState<OrderResponse[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [availableMonths, setAvailableMonths] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const result = await getHistory(search, Number(stan_id));
       setHistory(result);
+      
+      // Extract unique months from data
+      const months = new Set<string>();
+      result.forEach((item: OrderResponse) => {
+        if (item.createdAt) {
+          const monthKey = format(new Date(item.createdAt), "yyyy-MM");
+          months.add(monthKey);
+        }
+      });
+      const sortedMonths = Array.from(months).sort().reverse();
+      setAvailableMonths(sortedMonths);
+      // Set default to first month
+      if (sortedMonths.length > 0) {
+        setSelectedMonth(sortedMonths[0]);
+      }
     };
     fetchData();
   }, [search]);
-  // setTimeout(() => window.location.reload(), 500);
+
+  // Filter history by selected month
+  const filteredHistory = selectedMonth
+    ? history.filter((item) => {
+        if (!item.createdAt) return false;
+        const itemMonth = format(new Date(item.createdAt), "yyyy-MM");
+        return itemMonth === selectedMonth;
+      })
+    : history;
   return (
-    <div>
-      <div className="flex flex-col justify-center">
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <Sidebar />
+      
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-auto">
         <h1 className="font-bold text-3xl mt-10 text-center text-hitamGaHitam">
           Transaction History
         </h1>
-        <div className="bg-white my-10 p-6 rounded-lg w-full h-max box-border text-gray-800 overflow-x-auto shadow-md">
+
+        {/* Month Filter */}
+        <div className="bg-white my-6 mx-6 p-4 rounded-lg shadow-md">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Filter by Month
+          </label>
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Months</option>
+            {availableMonths.map((month) => (
+              <option key={month} value={month}>
+                {format(new Date(month + "-01"), "MMMM yyyy")}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="bg-white my-4 mx-6 p-6 rounded-lg h-max box-border text-gray-800 overflow-x-auto shadow-md">
           <table className="w-full border-collapse">
             <thead>
               <tr className="text-gray-600 space-x-4">
@@ -66,14 +126,14 @@ const TransaksiPage = () => {
               </tr>
             </thead>
             <tbody className="text-center">
-              {history.length === 0 ? (
+              {filteredHistory.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-4">
+                  <td colSpan={7} className="px-6 py-4">
                     <Alert>No data available</Alert>
                   </td>
                 </tr>
               ) : (
-                history.map((data, index) => (
+                filteredHistory.map((data, index) => (
                   <tr key={index} className="border-b border-gray-200 text-sm">
                     <td className="px-4 py-4 w-max">{String(index + 1)}</td>
                     <td className="px-4 py-4 w-max">
@@ -89,7 +149,7 @@ const TransaksiPage = () => {
                     </td>
                     <td className="px-4 py-4 w-max">{data.status}</td>
                     <td className="px-4 py-4 w-max">
-                      USD {parseFloat(data.total_price).toFixed(2)}
+                      {formatRupiah(parseFloat(data.total_price))}
                     </td>
                     <td className="px-4 py-4 w-max">
                       <span

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { get, put } from "@/lib/api-bridge";
+import { get } from "@/lib/api-bridge";
 import { getCookies } from "@/lib/server-cookies";
 import { BASE_API_URL } from "@/global";
 import { OrderResponse } from "@/app/types";
@@ -35,8 +35,7 @@ const formatRupiah = (number: number) => {
 
 export default function Details() {
   const [order, setOrder] = useState<OrderResponse | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string>("");
-  const [orderStatus, setOrderStatus] = useState<string>("");
+  
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
@@ -46,34 +45,15 @@ export default function Details() {
         const result = await getOrder(id);
         if (result) {
           setOrder(result);
-          setOrderStatus(result.status);
-          setPaymentStatus(result.PaymentOrder?.status || "");
         }
       }
     };
     fetchData();
   }, [id]);
 
-  const handleSubmit = async () => {
-    try {
-      if (!id) return;
-      const TOKEN = (await getCookies("token")) ?? "";
-      const url = `${BASE_API_URL}/order/${id}`;
-      const payload = {
-        order_status: orderStatus,
-        payment_status: paymentStatus,
-      };
-      const { data } = await put(url, JSON.stringify(payload), TOKEN);
-      if (data?.status) {
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const generateInvoice = () => {
     if (!order) return;
+    const totalFromItems = order.transaction_detail.reduce((sum, item) => sum + item.quantity * item.price, 0);
     const docDefinition = {
       content: [
         { text: "INVOICE", style: "header" },
@@ -95,7 +75,7 @@ export default function Details() {
           },
           margin: [0, 10, 0, 10],
         },
-        { text: `Total: ${formatRupiah(order.total_price)}`, style: "total" },
+        { text: `Total: ${formatRupiah(totalFromItems)}`, style: "total" },
         { text: `Status: ${order.status}`, margin: [0, 10, 0, 10] },
         {
           text: `Payment: ${order.PaymentOrder?.status}`,
@@ -116,6 +96,8 @@ export default function Details() {
     };
     pdfMake.createPdf(docDefinition).download(`Invoice_${order.id}.pdf`);
   };
+
+  const itemsTotal = order ? order.transaction_detail.reduce((sum, item) => sum + item.quantity * item.price, 0) : 0;
 
   return order ? (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -145,38 +127,10 @@ export default function Details() {
       <div className="mt-4">
         <h3 className="text-lg font-semibold">Total Price</h3>
         <p className="text-xl font-bold text-right">
-          {formatRupiah(order.total_price)}
+          {formatRupiah(itemsTotal)}
         </p>
       </div>
-      <div className="mt-4">
-        <h3 className="text-lg font-semibold">Status</h3>
-        <select
-          className="w-full p-2 border rounded mt-2"
-          value={paymentStatus}
-          onChange={(e) => setPaymentStatus(e.target.value)}
-        >
-          <option value="BELUM_DIBAYAR">Belum Dibayar</option>
-          <option value="LUNAS">Lunas</option>
-          <option value="CANCELED">Cancelled</option>
-          <option value="BELUM_LUNAS">Belum Lunas</option>
-        </select>
-        <select
-          className="w-full p-2 border rounded mt-2"
-          value={orderStatus}
-          onChange={(e) => setOrderStatus(e.target.value)}
-        >
-          <option value="NEW">New</option>
-          <option value="PAID">Paid</option>
-          <option value="DONE">Done</option>
-        </select>
-      </div>
       <div className="mt-4 flex space-x-4">
-        <button
-          onClick={handleSubmit}
-          className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-all"
-        >
-          Update Order
-        </button>
         <button
           onClick={generateInvoice}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all"
@@ -189,3 +143,5 @@ export default function Details() {
     <p className="text-center text-gray-500">Loading order data...</p>
   );
 }
+	
+

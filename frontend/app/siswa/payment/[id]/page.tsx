@@ -77,6 +77,28 @@ export default function PaymentPage() {
   }, [id]);
 
   const payOrder = async () => {
+    if (!email || email.trim() === "") {
+      Swal.fire({
+        title: "Error",
+        text: "Please enter your email address",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Ok",
+      });
+      return;
+    }
+
+    if (!selectedMethod) {
+      Swal.fire({
+        title: "Error",
+        text: "Please select a payment method",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Ok",
+      });
+      return;
+    }
+
     console.log("selectedMethod");
 
     try {
@@ -100,8 +122,6 @@ export default function PaymentPage() {
         payload.va = virtualAccount;
       }
 
-     
-      // payload
       const jsonPayload = JSON.stringify(payload);
 
       const { data } = await put(url, jsonPayload, TOKEN);
@@ -121,17 +141,14 @@ export default function PaymentPage() {
             showCancelButton: false,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Ok"
+            confirmButtonText: "Ok",
           }).then((result) => {
             if (result.isConfirmed) {
-             
               router.push("/");
             }
           });
         }
-        
       } else {
-      
       }
     } catch (error) {
       console.log(error);
@@ -143,6 +160,12 @@ export default function PaymentPage() {
     setShowVaNumber(false);
     let value = e;
     setSelectedMethod(value);
+    if (value === "cash") {
+      // Automatically set cash amount to order total
+      if (order?.total_price) {
+        setCashAmount(order.total_price.toString());
+      }
+    }
     if (value === "online") {
       const result = await getMethod("VIRTUAL");
       if (result) {
@@ -152,9 +175,7 @@ export default function PaymentPage() {
         setSelectedWallet(0);
       }
     }
-    
   };
-
 
   const handleSelectedWallet = (id: any) => {
     setSelectedWallet(id);
@@ -170,14 +191,14 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="flex bg-white h-screen w-screen font-poppins">
-      <div className="my-6 flex ml-8 cursor-pointer h-fit items-center hover:opacity-70 transition-all">
+    <div className="flex bg-white w-screen font-poppins flex-col md:flex-row md:h-screen">
+      <div className="my-4 md:my-6 flex items-center px-4 md:ml-8 cursor-pointer h-fit hover:opacity-70 transition-all">
         <IoChevronBackOutline size={24} />
         <button className="text-lg" onClick={() => history.back()}>
           Back
         </button>
       </div>
-      <div className="basis-2/3  pl-5 pr-16 py-20  flex flex-col">
+      <div className="w-full md:basis-2/3 pl-4 pr-4 md:pl-5 md:pr-16 py-8 md:py-20 flex flex-col order-2 md:order-1">
         <h1 className="text-4xl font-semibold">Payment details</h1>
         <label htmlFor="" className="mt-6" typeof="email">
           Email address
@@ -188,14 +209,14 @@ export default function PaymentPage() {
           placeholder="Your email"
           className="w-[100%] p-2 border rounded-lg mt-1"
         />
-        
+
         <div>
           <label className="mt-4 mb-5 block">Payment Method</label>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex flex-wrap gap-4">
             {paymentMethods.map((method) => (
               <div
                 key={method.id}
-                className={`group flex items-center gap-4 py-3 px-14 border-4 w-lg rounded-lg cursor-pointer transition-all ${
+                className={`group flex items-center gap-4 py-3 px-6 sm:px-10 border-4 min-w-[140px] sm:min-w-[200px] rounded-lg cursor-pointer transition-all ${
                   selectedMethod === method.id
                     ? "border-orange-400 text-orange-400"
                     : "border-[#F1F0F5] text-[#636978]"
@@ -208,22 +229,13 @@ export default function PaymentPage() {
                   viewBox="0 -960 960 960"
                 >
                   <path d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
-                </svg>
-                <h1 className="text-lg group-hover:text-orange-400">
+                  </svg>
+                  <h1 className="text-base sm:text-lg group-hover:text-orange-400">
                   {method.label}
                 </h1>
               </div>
             ))}
           </div>
-
-          {selectedMethod === "cash" && (
-            <input
-              type="number"
-              placeholder="Enter cash amount"
-              className="mt-4 p-2 border rounded w-full"
-              onChange={(e) => setCashAmount(e.target.value)}
-            />
-          )}
 
           {selectedMethod === "debit" && (
             <div className="mt-4 text-gray-600">
@@ -233,7 +245,7 @@ export default function PaymentPage() {
                   {DebitMethod?.map((element) => (
                     <div
                       key={element.id}
-                      className={`group flex items-center gap-4 py-3 px-14 border-4 w-lg rounded-lg cursor-pointer transition-all ${
+                      className={`group flex items-center gap-4 py-3 px-6 sm:px-10 border-4 min-w-[140px] sm:min-w-[200px] rounded-lg cursor-pointer transition-all ${
                         selectedWallet === element.id
                           ? "border-orange-400 text-orange-400"
                           : "border-[#F1F0F5] text-[#636978]"
@@ -247,7 +259,7 @@ export default function PaymentPage() {
                       >
                         <path d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
                       </svg>
-                      <h1 className="text-lg group-hover:text-orange-400">
+                      <h1 className="text-base sm:text-lg group-hover:text-orange-400">
                         {element.nama}
                       </h1>
                     </div>
@@ -273,13 +285,13 @@ export default function PaymentPage() {
 
           {selectedMethod === "online" && (
             <div className="mt-4 text-gray-600">
-              Transfer to:{" "}
+              Transfer to: {" "}
               {showOnlineMethod && (
-                <div className="flex flex-wrap gap-6">
+                <div className="flex flex-wrap gap-4">
                   {onlineMethod?.map((element) => (
                     <div
                       key={element.id}
-                      className={`group flex items-center gap-4 py-3 px-14 border-4 w-lg rounded-lg cursor-pointer transition-all ${
+                      className={`group flex items-center gap-4 py-3 px-6 sm:px-10 border-4 min-w-[140px] sm:min-w-[200px] rounded-lg cursor-pointer transition-all ${
                         selectedWallet === element.id
                           ? "border-orange-400 text-orange-400"
                           : "border-[#F1F0F5] text-[#636978]"
@@ -293,7 +305,7 @@ export default function PaymentPage() {
                       >
                         <path d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
                       </svg>
-                      <h1 className="text-lg group-hover:text-orange-400">
+                      <h1 className="text-base sm:text-lg group-hover:text-orange-400">
                         {element.nama}
                       </h1>
                     </div>
@@ -313,59 +325,68 @@ export default function PaymentPage() {
           Bayar Sekarang
         </button>
       </div>
-      <div className="basis-1/2 p-4 h-screen w-full">
-      <div className="bg-[#f7f7f7] p-10 rounded-lg w-full h-full shadow-md">
-  {/* total */}
-  <div className="flex flex-col items-center">
-    <h2 className="text-xl font-semibold text-gray-700">Total Amount</h2>
-    <h1 className="text-5xl font-bold text-primary my-3">
-      Rp. {order?.total_price.toLocaleString()}
-    </h1>
-  </div>
+      <div className="w-full md:basis-1/2 p-4 h-auto md:h-screen order-1 md:order-2">
+        <div className="bg-[#f7f7f7] p-6 md:p-10 rounded-lg w-full h-auto md:h-full shadow-md">
+          {/* total */}
+          <div className="flex flex-col items-center">
+            <h2 className="text-xl font-semibold text-gray-700">
+              Total Amount
+            </h2>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary my-3">
+              Rp. {order?.total_price.toLocaleString()}
+            </h1>
+          </div>
 
-  {/* order summary */}
-  <div className="px-4 my-8">
-    <h2 className="text-center text-2xl font-bold mb-10 text-gray-800">
-      Order Summary
-    </h2>
+          {/* order summary */}
+          <div className="px-4 my-8">
+            <h2 className="text-center text-2xl font-bold mb-10 text-gray-800">
+              Order Summary
+            </h2>
 
-    {/* header */}
-    <div className="grid grid-cols-4 text-sm font-semibold border-b pb-2 text-gray-600">
-      <p className="col-span-1">Menu</p>
-      <p className="col-span-1 text-center">Qty</p>
-      <p className="col-span-1 text-center">Price</p>
-      <p className="col-span-1 text-right">Subtotal</p>
-    </div>
+            {/* header (desktop) */}
+            <div className="hidden md:grid grid-cols-4 text-sm font-semibold border-b pb-2 text-gray-600">
+              <p className="col-span-1">Menu</p>
+              <p className="col-span-1 text-center">Qty</p>
+              <p className="col-span-1 text-center">Price</p>
+              <p className="col-span-1 text-right">Subtotal</p>
+            </div>
 
-    {/* item list */}
-    <div className="mt-3 space-y-3 text-sm text-gray-700">
-      {order?.transaction_detail?.map((item) => (
-        <div
-          key={item.id}
-          className="grid grid-cols-4 items-center"
-        >
-          <p className="col-span-1 capitalize">{item.menu.name}</p>
-          <p className="col-span-1 text-center">x{item.quantity}</p>
-          <p className="col-span-1 text-center">Rp. {item.price.toLocaleString()}</p>
-          <p className="col-span-1 text-right">
-            Rp. {item.subTotal.toLocaleString()}
-          </p>
+            {/* mobile item list (compact) */}
+            <div className="md:hidden mt-3 space-y-3 text-sm text-gray-700">
+              {order?.transaction_detail?.map((item) => (
+                <div key={item.id} className="flex justify-between items-start">
+                  <div>
+                    <p className="capitalize font-medium">{item.menu.name}</p>
+                    <p className="text-xs text-gray-600">x{item.quantity} • Rp. {item.price.toLocaleString()}</p>
+                  </div>
+                  <div className="text-right font-semibold">Rp. {item.subTotal.toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* desktop item list */}
+            <div className="hidden md:block mt-3 space-y-3 text-sm text-gray-700">
+              {order?.transaction_detail?.map((item) => (
+                <div key={item.id} className="grid grid-cols-4 items-center">
+                  <p className="col-span-1 capitalize">{item.menu.name}</p>
+                  <p className="col-span-1 text-center">x{item.quantity}</p>
+                  <p className="col-span-1 text-center">Rp. {item.price.toLocaleString()}</p>
+                  <p className="col-span-1 text-right">Rp. {item.subTotal.toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* total */}
+          <div className="grid grid-cols-4 border-t pt-4 px-4 text-gray-800">
+            <div className="col-span-3 text-right text-lg font-semibold">
+              Total
+            </div>
+            <div className="col-span-1 text-right text-lg font-bold text-primary">
+              Rp. {order?.total_price.toLocaleString()}
+            </div>
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-
-  {/* total */}
-  <div className="grid grid-cols-4 border-t pt-4 px-4 text-gray-800">
-    <div className="col-span-3 text-right text-lg font-semibold">Total</div>
-    <div className="col-span-1 text-right text-lg font-bold text-primary">
-      Rp. {order?.total_price.toLocaleString()}
-    </div>
-  </div>
-</div>
-
-
-
       </div>
     </div>
   );
